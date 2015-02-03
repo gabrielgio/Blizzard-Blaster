@@ -10,6 +10,7 @@ Part 2: Blizzard Blaster
 
 Write a simple arcade game in honor of the winter storm Juno.
 
+![alt tag](http://www2.cs.uidaho.edu/~jeffery/courses/328/bb.jpg)
 
 The premise is: you are shooting a heat ray into the sky from a mobile snowplow with a mounted heat gun that drives to and fro across the bottom of the screen, which represents a vital arterial street that it is your job to keep clear. Snow is coming in thicker and thicker as time progresses, but you can shoot the flakes if you can get under them. Your gun moves very quickly from side to side. If you fail to shoot a flake and it lands on the ground, it sticks, and the more snow that accumulates, the slower the snowplow's movement. The snowplow can maybe grind down some of the snow, and shove it off to the side, but it is a battle that you can never win. The game is over when the snowplow can no longer move.
 
