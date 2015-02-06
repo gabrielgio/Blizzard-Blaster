@@ -11,6 +11,8 @@ import com.blizzardBlaster.game.BlizzardBlaster;
  */
 public class Limit implements IEntity
 {
+    private boolean mustDie = false;
+
     //variables to create to set up a  left limit in the Box2D's world
     private BodyDef bodyDefLeft;
     private Body bodyLeft;
@@ -68,5 +70,21 @@ public class Limit implements IEntity
     public void Draw(Batch batch)
     {
 
+    }
+
+    @Override
+    public boolean GetMustDie() {
+        return mustDie;
+    }
+
+    @Override
+    public void SetMustDie(boolean mustDie) {
+        this.mustDie = mustDie;
+    }
+
+    @Override
+    public Body[] GetBodies()
+    {
+        return new Body[]{bodyLeft,bodyRight};
     }
 }

@@ -15,6 +15,7 @@ import java.util.Random;
  */
 public class Snow implements IEntity {
 
+    private boolean mustDie = false;
     //necessary variable to create a snow ball in the Box2D's world
     private Sprite sprite;
     private Texture texture;
@@ -48,7 +49,7 @@ public class Snow implements IEntity {
 
         //setting up the a shape of snow ball
         shape = new CircleShape();
-        shape.setRadius(.09f);
+        shape.setRadius(.1f);
         shape.setPosition(new Vector2(0,0));
 
         //sinceramente não sei oque é isso.
@@ -75,7 +76,23 @@ public class Snow implements IEntity {
      */
     public  void Draw(Batch batch)
     {
-        batch.draw(sprite, sprite.getX(), sprite.getY(),sprite.getOriginX(),sprite.getOriginY(), sprite.getWidth(),sprite.getHeight(),sprite.getScaleX(),sprite.getScaleY(),sprite.getRotation());
+        //batch.draw(sprite, sprite.getX(), sprite.getY(),sprite.getOriginX(),sprite.getOriginY(), sprite.getWidth(),sprite.getHeight(),sprite.getScaleX(),sprite.getScaleY(),sprite.getRotation());
+    }
+
+    @Override
+    public boolean GetMustDie() {
+        return mustDie;
+    }
+
+    @Override
+    public void SetMustDie(boolean mustDie) {
+        this.mustDie = mustDie;
+    }
+
+    @Override
+    public Body[] GetBodies()
+    {
+        return new Body[]{body};
     }
 
     /**

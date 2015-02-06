@@ -17,6 +17,7 @@ public class Ground implements IEntity {
     private Body body;
     private EdgeShape shape;
     private FixtureDef fixtureDef;
+    private boolean mustDie = false;
 
 
     /**
@@ -28,7 +29,7 @@ public class Ground implements IEntity {
         bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
         float w = Gdx.graphics.getWidth()/ BlizzardBlaster.GetPixelMeter();
-        float h = Gdx.graphics.getHeight()/BlizzardBlaster.GetPixelMeter()- 25/BlizzardBlaster.GetPixelMeter();
+        float h = Gdx.graphics.getHeight()/BlizzardBlaster.GetPixelMeter();
         bodyDef.position.set(0,0);
         fixtureDef = new FixtureDef();
 
@@ -41,6 +42,21 @@ public class Ground implements IEntity {
 
         shape.dispose();
 
+    }
+
+    @Override
+    public boolean GetMustDie() {
+        return mustDie;
+    }
+
+    @Override
+    public void SetMustDie(boolean mustDie) {
+        //denied, never will be deleted
+    }
+
+    @Override
+    public Body[] GetBodies() {
+        return new Body[]{body};
     }
 
     @Override
