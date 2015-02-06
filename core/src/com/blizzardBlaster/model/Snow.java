@@ -6,11 +6,16 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.blizzardBlaster.game.BlizzardBlaster;
 
 import java.util.Random;
 
-public class Snow {
+/**
+ * Model to a Snow Ball
+ */
+public class Snow implements IEntity {
 
+    //necessary variable to create a snow ball in the Box2D's world
     private Sprite sprite;
     private Texture texture;
     private BodyDef bodyDef;
@@ -18,56 +23,69 @@ public class Snow {
     private CircleShape shape;
     private FixtureDef fixtureDef;
 
+    /*
+     * Constructor
+     * @param Box2D's world for creates body and applies physics
+     */
     public Snow(World world)
     {
+        //creating texture,
+        // texture are in pixel be careful to convert to meter before update on screen
         texture = new Texture("snowball.png");
         sprite = new Sprite(texture);
-        sprite.setSize(20,20);
-        sprite.setOrigin(10f,10f);
+        sprite.setSize(30,30);
+        sprite.setOrigin(sprite.getWidth()/2,sprite.getHeight()/2);
 
+        //setting up the definition fot the bady.
         bodyDef = new BodyDef();
+        //the snow ball moves
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(RadonWidth(), (Gdx.graphics.getHeight()/100f)/2);
+        //set in a random X but in a fixed Y(roof)
+        bodyDef.position.set(RadonWidth(), (Gdx.graphics.getHeight()/BlizzardBlaster.GetPixelMeter())/2);
 
+        //creating a body from body definition
         body = world.createBody(bodyDef);
 
+        //setting up the a shape of snow ball
         shape = new CircleShape();
-        shape.setRadius(.07f);
+        shape.setRadius(.09f);
         shape.setPosition(new Vector2(0,0));
 
+        //sinceramente não sei oque é isso.
         fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 10f;
-        fixtureDef.restitution = 0f;
+        fixtureDef.restitution = .1f;
+        fixtureDef.friction = 1f;
 
         body.createFixture(fixtureDef);
+
         shape.dispose();
     }
 
     public void Update()
     {
-        sprite.setPosition((body.getPosition().x*100f)-sprite.getWidth()/2, (body.getPosition().y*100f)-sprite.getHeight()/2);
+        sprite.setPosition((body.getPosition().x* BlizzardBlaster.GetPixelMeter())-sprite.getWidth()/2, (body.getPosition().y*BlizzardBlaster.GetPixelMeter())-sprite.getHeight()/2);
         sprite.setRotation((float)Math.toDegrees(body.getAngle()));
-        //body.applyForce(0,-100,0,0,true);
     }
 
+    /**
+     *
+     * @param batch
+     */
     public  void Draw(Batch batch)
     {
-        batch.draw(sprite, sprite.getX(), sprite.getY(),sprite.getOriginX(),
-                sprite.getOriginY(),
-                sprite.getWidth(),sprite.getHeight(),sprite.getScaleX(),sprite.
-                        getScaleY(),sprite.getRotation());
+        batch.draw(sprite, sprite.getX(), sprite.getY(),sprite.getOriginX(),sprite.getOriginY(), sprite.getWidth(),sprite.getHeight(),sprite.getScaleX(),sprite.getScaleY(),sprite.getRotation());
     }
 
-    public Sprite GetSprit()
-    {
-        return  sprite;
-    }
-
+    /**
+     * Create a random number based on with screem
+     * @return Randomized number
+     */
     private float RadonWidth()
     {
-        float minX = -(Gdx.graphics.getWidth()/100f)/2;
-        float maxX = (Gdx.graphics.getWidth()/100f)/2;
+        float minX = -(Gdx.graphics.getWidth()/BlizzardBlaster.GetPixelMeter())/2;
+        float maxX = (Gdx.graphics.getWidth()/BlizzardBlaster.GetPixelMeter())/2;
         Random rand = new Random();
         return rand.nextFloat() * (maxX - minX) + minX;
     }
