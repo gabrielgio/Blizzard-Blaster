@@ -22,11 +22,13 @@ public class BaseGun implements IEntity
     private PolygonShape shape;
     private FixtureDef fixtureDef;
 
+    private BodyDef bodyDefCir;
+    private Body bodyCir;
+    private CircleShape shapeCir;
+    private FixtureDef fixtureDefCir;
+
     public BaseGun(World world)
     {
-//creating texture,
-        // texture are in pixel be careful to convert to meter before update on screen
-
         //setting up the definition fot the bady.
         bodyDef = new BodyDef();
         //the snow ball moves
@@ -39,7 +41,7 @@ public class BaseGun implements IEntity
 
         shape = new PolygonShape();
 
-        shape.setAsBox(1,.25f);
+        shape.setAsBox(1,1);
 
         //sinceramente não sei oque é isso.
         fixtureDef = new FixtureDef();
@@ -49,6 +51,29 @@ public class BaseGun implements IEntity
         body.createFixture(fixtureDef);
 
         shape.dispose();
+
+        //setting up the definition fot the bady.
+        bodyDefCir = new BodyDef();
+        //the snow ball moves
+        bodyDefCir.type = BodyDef.BodyType.StaticBody;
+        //set in a random X but in a fixed Y(roof)
+        bodyDefCir.position.set(bodyDefCir.position.x,(-((Gdx.graphics.getHeight()/BlizzardBlaster.GetPixelMeter())/2)+1.25f));
+
+        //creating a bodyCir from bodyCir definition
+        bodyCir = world.createBody(bodyDefCir);
+
+        shapeCir = new CircleShape();
+
+        shapeCir.setRadius(.75f);
+
+        //sinceramente não sei oque é isso.
+        fixtureDefCir = new FixtureDef();
+        fixtureDefCir.shape = shapeCir;
+        fixtureDefCir.density = 10f;
+
+        bodyCir.createFixture(fixtureDefCir);
+
+        shapeCir.dispose();
     }
 
     @Override
@@ -78,6 +103,6 @@ public class BaseGun implements IEntity
     @Override
     public Body[] GetBodies()
     {
-        return new Body[]{body};
+        return new Body[]{body,bodyCir};
     }
 }
