@@ -1,10 +1,7 @@
 package com.blizzardBlaster.model;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.physics.box2d.*;
 import com.blizzardBlaster.game.BlizzardBlaster;
@@ -13,7 +10,7 @@ import com.blizzardBlaster.game.GameSetting;
 /**
  * Created by gabrielgiovaninidesouza on 2/8/15.
  */
-public class Projectile implements IEntity
+public class Projectile implements Entity
 {
 
     private boolean mustDie = false;
@@ -62,35 +59,35 @@ public class Projectile implements IEntity
     }
 
     @Override
-    public void Update()
+    public void update()
     {
         if(body.getPosition().x > GameSetting.MAX_TO_DIE || body.getPosition().y > GameSetting.MAX_TO_DIE)
             mustDie = true;
 
-        sprite.setPosition((body.getPosition().x* BlizzardBlaster.GetPixelMeter())-sprite.getWidth()/2, (body.getPosition().y*BlizzardBlaster.GetPixelMeter())-sprite.getHeight()/2);
+        sprite.setPosition((body.getPosition().x* GameSetting.PIXELS_TO_METERS)-sprite.getWidth()/2, (body.getPosition().y*GameSetting.PIXELS_TO_METERS)-sprite.getHeight()/2);
         sprite.setRotation((float)Math.toDegrees(body.getAngle()));
     }
 
     @Override
-    public void Draw(Batch batch)
+    public void draw(Batch batch)
     {
         batch.draw(sprite, sprite.getX(), sprite.getY(),sprite.getOriginX(),sprite.getOriginY(), sprite.getWidth(),sprite.getHeight(),sprite.getScaleX(),sprite.getScaleY(),sprite.getRotation());
     }
 
     @Override
-    public boolean GetMustDie()
+    public boolean getMustDie()
     {
         return mustDie;
     }
 
     @Override
-    public void SetMustDie(boolean mustDie)
+    public void setMustDie(boolean mustDie)
     {
         this.mustDie = mustDie;
     }
 
     @Override
-    public Body[] GetBodies()
+    public Body[] getBodies()
     {
         return new Body[]{body};
     }

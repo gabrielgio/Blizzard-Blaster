@@ -6,35 +6,38 @@ import com.badlogic.gdx.physics.box2d.Body;
 /**
  * Define basics function for a Entity which will added int the scenario.
  */
-public interface IEntity
-{
+public interface Entity {
     /**
-     * Update properties of a Entity
+     * update properties of a Entity
      */
-    public void Update();
+    public void update();
 
     /**
      * If needed draw on batch
+     *
      * @param batch batch to draw
      */
-    public void Draw(Batch batch);
+    public void draw(Batch batch);
 
     /**
      * Get MustDie value (why java are u not C#?)
+     *
      * @return MustDie value
      */
-    public boolean GetMustDie();
+    public boolean getMustDie();
 
     /**
      * Set MustDie value
+     *
      * @param mustDie value to be set
      */
-    public void SetMustDie(boolean mustDie);
+    public void setMustDie(boolean mustDie);
 
     /**
      * Get Entity's Body;
+     *
      * @return
      */
-    public Body[] GetBodies();
+    public Body[] getBodies();
 
 }

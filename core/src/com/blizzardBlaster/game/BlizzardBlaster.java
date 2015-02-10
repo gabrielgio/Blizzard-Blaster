@@ -13,30 +13,26 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.blizzardBlaster.model.*;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 
 /**
  * This is the game for itself, here contains whole logic game.
- * TODO: add more explanations about this class.
  */
-public class BlizzardBlaster extends ApplicationAdapter implements InputProcessor, ContactListener, DestructionListener
-{
-    //I get here: http://stackoverflow.com/questions/3776204/how-to-find-out-if-debug-mode-is-enabled
-    private boolean isDebug = true;
-
+public class BlizzardBlaster extends ApplicationAdapter implements InputProcessor, ContactListener, DestructionListener {
     private SpriteBatch batch;
     private World world;
     private OrthographicCamera camera;
     private Matrix4 debugMatrix;
     private Box2DDebugRenderer debugRenderer;
     private Cannon cannon;
-    private float time = 0;
-    private float timeShoot = 0;
     private BitmapFont font;
 
-    //list of IEntity that will be updated and draw
-    private ArrayList<IEntity> entities = new ArrayList();
+    private float time = 0;
+    private float timeShoot = 0;
+    private int point = 0;
+
+    //list of Entity that will be updated and drew
+    private ArrayList<Entity> entities = new ArrayList();
 
     @Override
     public void create() {
@@ -46,8 +42,8 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
         world.setContactListener(this);
         world.setDestructionListener(this);
         //the game has been built based in this resolution
-        Gdx.graphics.setDisplayMode(1280,720,false);
-        camera = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        Gdx.graphics.setDisplayMode(1280, 720, false);
+        camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         font = new BitmapFont();
         font.setColor(Color.BLACK);
@@ -59,100 +55,90 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
         Limit limit = new Limit(world);
         //adding base
         BaseGun base = new BaseGun(world);
-        //adding base cannon
+        //adding cannon
         cannon = new Cannon(world);
 
         entities.add(base);
         entities.add(cannon);
-        Gdx.input.setCursorImage(null,0,0);
+
         Gdx.input.setInputProcessor(this);
     }
 
     @Override
-    public void render()
-    {
+    public void render() {
+        //stepping the world
         world.step(Gdx.graphics.getDeltaTime(), 20, 2);
 
-        CheckScheduledToDie();
+        checkScheduledToDie();
 
-        ApplySnow();
+        applySnow();
 
         timeShoot -= Gdx.graphics.getDeltaTime();
 
-        for (IEntity entity : entities)
-                entity.Update();
+        for (Entity entity : entities)
+            entity.update();
 
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.setProjectionMatrix(camera.combined);
         debugRenderer = new Box2DDebugRenderer();
-        debugMatrix = batch.getProjectionMatrix().cpy().scale(GameSetting.PIXELS_TO_METERS,GameSetting.PIXELS_TO_METERS, 0);
+        debugMatrix = batch.getProjectionMatrix().cpy().scale(GameSetting.PIXELS_TO_METERS, GameSetting.PIXELS_TO_METERS, 0);
 
+        //drawing sprites
         batch.begin();
-        //Drawing
-        for (IEntity entity : entities)
-                entity.Draw(batch);
 
+        //Drawing
+        for (Entity entity : entities)
+            entity.draw(batch);
+
+        //counting snow balls
         int count = 0;
-        for(IEntity entity : entities)
-        {
-            if(entity instanceof Snow)
+        for (Entity entity : entities) {
+            if (entity instanceof Snow)
                 count++;
 
-            if(count == 100)
-                Reset();
+            if (count == 100)
+                reset();
         }
 
-        font.draw(batch, "Snow Balls: " + count, -Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2 );
+        font.draw(batch, "Snow Balls: " + count, -Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+        font.draw(batch, "Points: " + point, Gdx.graphics.getWidth() / 2 - 100, Gdx.graphics.getHeight() / 2);
 
         batch.end();
 
-        //if (isDebug) debugRenderer.render(world, debugMatrix);
+        if (GameSetting.IS_DEBUGGING) debugRenderer.render(world, debugMatrix);
     }
 
-    private void ApplySnow() {
-        if(time > GameSetting.SNOW_PERIOD)
-        {
+    private void applySnow() {
+        if (time > GameSetting.SNOW_PERIOD) {
             time = 0;
             entities.add(new Snow(world));
-        }
-        else
+        } else
             time += Gdx.graphics.getDeltaTime();
     }
 
     /**
-     * Relationship(I am not sure that is the correct word) between pixel and meters
+     * Reset the level
      */
-    public static float GetPixelMeter()
-    {
-        return GameSetting.PIXELS_TO_METERS;
-    }
-
-    /**
-     * Relationship(I am not sure that is the correct word) between pixel and meters
-     */
-    public void Reset()
-    {
-        for(IEntity entity : entities)
-        {
-          if(entity instanceof Snow)
-            entity.SetMustDie(true);
+    public void reset() {
+        point = 0;
+        for (Entity entity : entities) {
+            if (entity instanceof Snow)
+                entity.setMustDie(true);
         }
     }
 
     /**
      * Delete body scheduled to die.
      */
-    private void CheckScheduledToDie()
-    {
+    private void checkScheduledToDie() {
         //I had to do it because Java don't lambda expression, shame of you Java
-        ArrayList<IEntity> entitiesToDie = new ArrayList<IEntity>();
+        ArrayList<Entity> entitiesToDie = new ArrayList<Entity>();
 
-        for(IEntity entity : entities)
-            if(entity.GetMustDie())
-            {
-                for (Body body : entity.GetBodies()) {
+        for (Entity entity : entities)
+            if (entity.getMustDie()) {
+                for (Body body : entity.getBodies()) {
                     world.destroyBody(body);
                 }
                 entitiesToDie.add(entity);
@@ -163,24 +149,23 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
     }
 
     /**
-     * Search and find a IEntity from Body.
+     * Search and find a Entity from a Body.
+     *
      * @param body body to be compared.
-     * @return IEntity with that body.
+     * @return Entity with that body.
      */
-    public IEntity GetEntityFromBody(Body body)
-    {
-        for(IEntity entity: entities)
-        for (Body bodyA : entity.GetBodies())
-            if( bodyA ==  body)
-                return entity;
+    public Entity getEntityFromBody(Body body) {
+        for (Entity entity : entities)
+            for (Body bodyA : entity.getBodies())
+                if (bodyA == body)
+                    return entity;
 
         return null;
     }
 
     //region key bindings
     @Override
-    public boolean keyDown(int keycode)
-    {
+    public boolean keyDown(int keycode) {
         return false;
     }
 
@@ -190,15 +175,13 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
     }
 
     @Override
-    public boolean keyTyped(char character)
-    {
+    public boolean keyTyped(char character) {
         return false;
     }
 
     @Override
-    public boolean touchDown(int x, int y, int pointer, int button)
-    {
-        if(timeShoot <= 0) {
+    public boolean touchDown(int x, int y, int pointer, int button) {
+        if (timeShoot <= 0) {
 
             timeShoot = GameSetting.TIME_TO_SHOOT;
 
@@ -206,31 +189,29 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
             float vecX = (float) Math.cos(angle) * 1.15f;
             float vecY = (float) Math.sin(angle) * 1.15f;
 
-            Projectile projectile = new Projectile(world, vecX, vecY + (-((Gdx.graphics.getHeight() / BlizzardBlaster.GetPixelMeter()) / 2) + 1.25f));
+            Projectile projectile = new Projectile(world, vecX, vecY + (-((Gdx.graphics.getHeight() / GameSetting.PIXELS_TO_METERS) / 2) + 1.25f));
             entities.add(projectile);
-            projectile.GetBodies()[0].applyForceToCenter(vecX * 1000, vecY * 1000, true);
+            projectile.getBodies()[0].applyForceToCenter(vecX * 1000, vecY * 1000, true);
         }
         return false;
     }
 
     @Override
-    public boolean touchUp(int x, int y, int pointer, int button)
-    {
+    public boolean touchUp(int x, int y, int pointer, int button) {
         return false;
     }
 
     @Override
-    public boolean touchDragged(int x, int y, int pointer)
-    {
+    public boolean touchDragged(int x, int y, int pointer) {
         return false;
     }
 
     @Override
-    public boolean mouseMoved(int x, int y)
-    {
-        float metX = Gdx.graphics.getWidth()/2 - x;
+    public boolean mouseMoved(int x, int y) {
+        float metX = Gdx.graphics.getWidth() / 2 - x;
         float metY = Gdx.graphics.getHeight() - 127.5f - y;
-        cannon.setAngle((float)((Math.atan(metX/metY)) + Math.PI));
+        cannon.setAngle((float) ((Math.atan(metX / metY)) + Math.PI));
+
         return false;
     }
 
@@ -246,13 +227,13 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
     @Override
     public void beginContact(Contact contact) {
 
-        IEntity entityA = GetEntityFromBody(contact.getFixtureA().getBody());
-        IEntity entityB = GetEntityFromBody(contact.getFixtureB().getBody());
+        Entity entityA = getEntityFromBody(contact.getFixtureA().getBody());
+        Entity entityB = getEntityFromBody(contact.getFixtureB().getBody());
 
-        if((entityA instanceof Projectile && !(entityB instanceof Projectile)) || (entityB instanceof Projectile && !(entityA instanceof Projectile)) && entityB != null && entityA != null)
-        {
-            entityA.SetMustDie(true);
-            entityB.SetMustDie(true);
+        if ((entityA instanceof Projectile && !(entityB instanceof Projectile)) || (entityB instanceof Projectile && !(entityA instanceof Projectile)) && entityB != null && entityA != null) {
+            entityA.setMustDie(true);
+            entityB.setMustDie(true);
+            point++;
         }
 
     }

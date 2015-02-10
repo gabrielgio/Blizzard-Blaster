@@ -1,18 +1,18 @@
 package com.blizzardBlaster.model;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.blizzardBlaster.game.BlizzardBlaster;
+import com.blizzardBlaster.game.GameSetting;
 
 /**
  * Created by gabrielgiovaninidesouza on 2/7/15.
  */
-public class Cannon implements IEntity
+public class Cannon implements Entity
 {
     private boolean mustDie = false;
 
@@ -36,7 +36,7 @@ public class Cannon implements IEntity
         //the snow ball moves
         bodyDef.type = BodyDef.BodyType.StaticBody;
         //set in a random X but in a fixed Y(roof)
-        bodyDef.position.set(bodyDef.position.x,(-((Gdx.graphics.getHeight()/ BlizzardBlaster.GetPixelMeter())/2)+1.25f));
+        bodyDef.position.set(bodyDef.position.x,(-((Gdx.graphics.getHeight()/ GameSetting.PIXELS_TO_METERS)/2)+1.25f));
 
         bodyDef.position.angle(new Vector2(0,1.5f));
 
@@ -69,35 +69,35 @@ public class Cannon implements IEntity
     }
 
     @Override
-    public void Update()
+    public void update()
     {
         if(angle < 1.5*Math.PI && angle > Math.PI/2)
         body.setTransform(body.getPosition(),angle);
 
-        sprite.setPosition((body.getPosition().x* BlizzardBlaster.GetPixelMeter())-sprite.getWidth()/2, (body.getPosition().y*BlizzardBlaster.GetPixelMeter())-sprite.getHeight()/2);
-        sprite.setRotation((float)Math.toDegrees(body.getAngle()));
+        sprite.setPosition((body.getPosition().x * GameSetting.PIXELS_TO_METERS) - sprite.getWidth() / 2, (body.getPosition().y * GameSetting.PIXELS_TO_METERS) - sprite.getHeight() / 2);
+        sprite.setRotation((float) Math.toDegrees(body.getAngle()));
     }
 
     @Override
-    public void Draw(Batch batch)
+    public void draw(Batch batch)
     {
         batch.draw(sprite, sprite.getX(), sprite.getY()-40,sprite.getOriginX(),sprite.getOriginY(), sprite.getWidth(),sprite.getHeight(),sprite.getScaleX(),sprite.getScaleY(),sprite.getRotation());
     }
 
     @Override
-    public boolean GetMustDie()
+    public boolean getMustDie()
     {
         return mustDie;
     }
 
     @Override
-    public void SetMustDie(boolean mustDie)
+    public void setMustDie(boolean mustDie)
     {
         //NEVER MUST DIE
     }
 
     @Override
-    public Body[] GetBodies() {
+    public Body[] getBodies() {
         return new Body[0];
     }
 }

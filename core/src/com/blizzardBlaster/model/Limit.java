@@ -5,12 +5,12 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.blizzardBlaster.game.BlizzardBlaster;
+import com.blizzardBlaster.game.GameSetting;
 
 /**
  * Model for right and left limit;
  */
-public class Limit implements IEntity
-{
+public class Limit implements Entity {
     private boolean mustDie = false;
 
     //variables to create to set up a  left limit in the Box2D's world
@@ -25,19 +25,18 @@ public class Limit implements IEntity
     private EdgeShape shapeRight;
     private FixtureDef fixtureDefRight;
 
-    public Limit(World world)
-    {
-        float w = Gdx.graphics.getWidth()/ BlizzardBlaster.GetPixelMeter();
-        float h = Gdx.graphics.getHeight()/BlizzardBlaster.GetPixelMeter();
+    public Limit(World world) {
+        float w = Gdx.graphics.getWidth() / GameSetting.PIXELS_TO_METERS;
+        float h = Gdx.graphics.getHeight() / GameSetting.PIXELS_TO_METERS;
 
         bodyDefLeft = new BodyDef();
         bodyDefLeft.type = BodyDef.BodyType.StaticBody;
 
-        bodyDefLeft.position.set(0,0);
+        bodyDefLeft.position.set(0, 0);
         fixtureDefLeft = new FixtureDef();
 
         shapeLeft = new EdgeShape();
-        shapeLeft.set(new Vector2(-w / 2,h / 2), new Vector2(-w / 2,-h / 2));
+        shapeLeft.set(new Vector2(-w / 2, h / 2), new Vector2(-w / 2, -h / 2));
         fixtureDefLeft.shape = shapeLeft;
 
         bodyLeft = world.createBody(bodyDefLeft);
@@ -47,7 +46,7 @@ public class Limit implements IEntity
 
         bodyDefRight = new BodyDef();
         bodyDefRight.type = BodyDef.BodyType.StaticBody;
-        bodyDefRight.position.set(0,0);
+        bodyDefRight.position.set(0, 0);
         fixtureDefRight = new FixtureDef();
 
         shapeRight = new EdgeShape();
@@ -61,30 +60,27 @@ public class Limit implements IEntity
     }
 
     @Override
-    public void Update()
-    {
+    public void update() {
 
     }
 
     @Override
-    public void Draw(Batch batch)
-    {
+    public void draw(Batch batch) {
 
     }
 
     @Override
-    public boolean GetMustDie() {
+    public boolean getMustDie() {
         return mustDie;
     }
 
     @Override
-    public void SetMustDie(boolean mustDie) {
+    public void setMustDie(boolean mustDie) {
         this.mustDie = mustDie;
     }
 
     @Override
-    public Body[] GetBodies()
-    {
-        return new Body[]{bodyLeft,bodyRight};
+    public Body[] getBodies() {
+        return new Body[]{bodyLeft, bodyRight};
     }
 }

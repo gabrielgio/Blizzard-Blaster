@@ -4,16 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.blizzardBlaster.game.BlizzardBlaster;
+import com.blizzardBlaster.game.GameSetting;
 
 import java.util.Random;
 
 /**
  * Model to a Snow Ball
  */
-public class Snow implements IEntity {
+public class Snow implements Entity {
 
     private boolean mustDie = false;
     //necessary variable to create a snow ball in the Box2D's world
@@ -28,21 +27,20 @@ public class Snow implements IEntity {
      * Constructor
      * @param Box2D's world for creates body and applies physics
      */
-    public Snow(World world)
-    {
+    public Snow(World world) {
         //creating texture,
         // texture are in pixel be careful to convert to meter before update on screen
         texture = new Texture("snowball.png");
         sprite = new Sprite(texture);
-        sprite.setSize(40,40);
-        sprite.setOrigin(sprite.getWidth()/2,sprite.getHeight()/2);
+        sprite.setSize(40, 40);
+        sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
 
         //setting up the definition fot the bady.
         bodyDef = new BodyDef();
         //the snow ball moves
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         //set in a random X but in a fixed Y(roof)
-        bodyDef.position.set(RadonWidth(), (Gdx.graphics.getHeight()/BlizzardBlaster.GetPixelMeter())/2);
+        bodyDef.position.set(radonWidth(), (Gdx.graphics.getHeight() / GameSetting.PIXELS_TO_METERS) / 2);
 
         //creating a body from body definition
         body = world.createBody(bodyDef);
@@ -63,45 +61,41 @@ public class Snow implements IEntity {
         shape.dispose();
     }
 
-    public void Update()
-    {
-        sprite.setPosition((body.getPosition().x* BlizzardBlaster.GetPixelMeter())-sprite.getWidth()/2, (body.getPosition().y*BlizzardBlaster.GetPixelMeter())-sprite.getHeight()/2);
-        sprite.setRotation((float)Math.toDegrees(body.getAngle()));
+    public void update() {
+        sprite.setPosition((body.getPosition().x * GameSetting.PIXELS_TO_METERS) - sprite.getWidth() / 2, (body.getPosition().y * GameSetting.PIXELS_TO_METERS) - sprite.getHeight() / 2);
+        sprite.setRotation((float) Math.toDegrees(body.getAngle()));
     }
 
     /**
-     *
      * @param batch
      */
-    public  void Draw(Batch batch)
-    {
-       batch.draw(sprite, sprite.getX(), sprite.getY(),sprite.getOriginX(),sprite.getOriginY(), sprite.getWidth(),sprite.getHeight(),sprite.getScaleX(),sprite.getScaleY(),sprite.getRotation());
+    public void draw(Batch batch) {
+        batch.draw(sprite, sprite.getX(), sprite.getY(), sprite.getOriginX(), sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), sprite.getRotation());
     }
 
     @Override
-    public boolean GetMustDie() {
+    public boolean getMustDie() {
         return mustDie;
     }
 
     @Override
-    public void SetMustDie(boolean mustDie) {
+    public void setMustDie(boolean mustDie) {
         this.mustDie = mustDie;
     }
 
     @Override
-    public Body[] GetBodies()
-    {
+    public Body[] getBodies() {
         return new Body[]{body};
     }
 
     /**
      * Create a random number based on with screem
+     *
      * @return Randomized number
      */
-    private float RadonWidth()
-    {
-        float minX = -(Gdx.graphics.getWidth()/BlizzardBlaster.GetPixelMeter())/2;
-        float maxX = (Gdx.graphics.getWidth()/BlizzardBlaster.GetPixelMeter())/2;
+    private float radonWidth() {
+        float minX = -(Gdx.graphics.getWidth() / GameSetting.PIXELS_TO_METERS) / 2;
+        float maxX = (Gdx.graphics.getWidth() / GameSetting.PIXELS_TO_METERS) / 2;
         Random rand = new Random();
         return rand.nextFloat() * (maxX - minX) + minX;
     }
