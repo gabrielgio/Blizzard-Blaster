@@ -13,9 +13,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.blizzardBlaster.model.*;
 
-
+import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
-import java.util.function.Predicate;
 
 /**
  * This is the game for itself, here contains whole logic game.
@@ -34,6 +33,7 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
     private Cannon cannon;
     private float time = 0;
     private float timeShoot = 0;
+    private BitmapFont font;
 
     //list of IEntity that will be updated and draw
     private ArrayList<IEntity> entities = new ArrayList();
@@ -49,8 +49,10 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
         Gdx.graphics.setDisplayMode(1280,720,false);
         camera = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 
-        //making level
+        font = new BitmapFont();
+        font.setColor(Color.BLACK);
 
+        //making level
         //adding ground on scene
         Ground ground = new Ground(world);
         //adding limit
@@ -60,6 +62,7 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
         //adding base cannon
         cannon = new Cannon(world);
 
+        entities.add(base);
         entities.add(cannon);
         Gdx.input.setCursorImage(null,0,0);
         Gdx.input.setInputProcessor(this);
@@ -68,7 +71,7 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
     @Override
     public void render()
     {
-        world.step(Gdx.graphics.getDeltaTime(), 6, 2);
+        world.step(Gdx.graphics.getDeltaTime(), 20, 2);
 
         CheckScheduledToDie();
 
@@ -78,7 +81,6 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
 
         for (IEntity entity : entities)
                 entity.Update();
-
 
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -91,6 +93,18 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
         //Drawing
         for (IEntity entity : entities)
                 entity.Draw(batch);
+
+        int count = 0;
+        for(IEntity entity : entities)
+        {
+            if(entity instanceof Snow)
+                count++;
+
+            if(count == 100)
+                Reset();
+        }
+
+        font.draw(batch, "Snow Balls: " + count, -Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2 );
 
         batch.end();
 
@@ -113,6 +127,18 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
     public static float GetPixelMeter()
     {
         return GameSetting.PIXELS_TO_METERS;
+    }
+
+    /**
+     * Relationship(I am not sure that is the correct word) between pixel and meters
+     */
+    public void Reset()
+    {
+        for(IEntity entity : entities)
+        {
+          if(entity instanceof Snow)
+            entity.SetMustDie(true);
+        }
     }
 
     /**
@@ -177,8 +203,8 @@ public class BlizzardBlaster extends ApplicationAdapter implements InputProcesso
             timeShoot = GameSetting.TIME_TO_SHOOT;
 
             float angle = (float) (cannon.getAngle() + 1.5 * Math.PI);
-            float vecX = (float) Math.cos(angle) * 1.25f;
-            float vecY = (float) Math.sin(angle) * 1.25f;
+            float vecX = (float) Math.cos(angle) * 1.15f;
+            float vecY = (float) Math.sin(angle) * 1.15f;
 
             Projectile projectile = new Projectile(world, vecX, vecY + (-((Gdx.graphics.getHeight() / BlizzardBlaster.GetPixelMeter()) / 2) + 1.25f));
             entities.add(projectile);

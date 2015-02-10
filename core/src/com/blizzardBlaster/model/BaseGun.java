@@ -22,6 +22,8 @@ public class BaseGun implements IEntity
     private PolygonShape shape;
     private FixtureDef fixtureDef;
 
+    private Sprite spriteCir;
+    private Texture textureCir;
     private BodyDef bodyDefCir;
     private Body bodyCir;
     private CircleShape shapeCir;
@@ -29,6 +31,13 @@ public class BaseGun implements IEntity
 
     public BaseGun(World world)
     {
+        //creating texture,
+        // texture are in pixel be careful to convert to meter before update on screen
+        texture = new Texture("square.png");
+        sprite = new Sprite(texture);
+        sprite.setSize(175,175);
+        sprite.setOrigin(sprite.getWidth()/2,sprite.getHeight()/2);
+
         //setting up the definition fot the bady.
         bodyDef = new BodyDef();
         //the snow ball moves
@@ -51,6 +60,14 @@ public class BaseGun implements IEntity
         body.createFixture(fixtureDef);
 
         shape.dispose();
+
+
+        //creating texture,
+        // texture are in pixel be careful to convert to meter before update on screen
+        textureCir = new Texture("circle.png");
+        spriteCir = new Sprite(textureCir);
+        spriteCir.setSize(150,150);
+        spriteCir.setOrigin(spriteCir.getWidth()/2,spriteCir.getHeight()/2);
 
         //setting up the definition fot the bady.
         bodyDefCir = new BodyDef();
@@ -79,13 +96,18 @@ public class BaseGun implements IEntity
     @Override
     public void Update()
     {
+        sprite.setPosition((body.getPosition().x* BlizzardBlaster.GetPixelMeter())-sprite.getWidth()/2, (body.getPosition().y*BlizzardBlaster.GetPixelMeter())-sprite.getHeight()/2);
+        sprite.setRotation((float)Math.toDegrees(body.getAngle()));
 
+        spriteCir.setPosition((bodyCir.getPosition().x* BlizzardBlaster.GetPixelMeter())-spriteCir.getWidth()/2, (bodyCir.getPosition().y*BlizzardBlaster.GetPixelMeter())-spriteCir.getHeight()/2);
+        spriteCir.setRotation((float)Math.toDegrees(bodyCir.getAngle()));
     }
 
     @Override
     public void Draw(Batch batch)
     {
-
+        batch.draw(spriteCir, spriteCir.getX(), spriteCir.getY(),spriteCir.getOriginX(),spriteCir.getOriginY(), spriteCir.getWidth(),spriteCir.getHeight(),spriteCir.getScaleX(),spriteCir.getScaleY(),spriteCir.getRotation());
+        batch.draw(sprite, sprite.getX(), sprite.getY(),sprite.getOriginX(),sprite.getOriginY(), sprite.getWidth(),sprite.getHeight(),sprite.getScaleX(),sprite.getScaleY(),sprite.getRotation());
     }
 
     @Override
@@ -97,7 +119,7 @@ public class BaseGun implements IEntity
     @Override
     public void SetMustDie(boolean mustDie)
     {
-        this.mustDie = mustDie;
+        //NEVER MUST DIE
     }
 
     @Override

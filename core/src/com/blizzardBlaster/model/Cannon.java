@@ -2,7 +2,9 @@ package com.blizzardBlaster.model;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.blizzardBlaster.game.BlizzardBlaster;
@@ -14,6 +16,8 @@ public class Cannon implements IEntity
 {
     private boolean mustDie = false;
 
+    private Sprite sprite;
+    private Texture texture;
     private BodyDef bodyDef;
     private Body body;
     private PolygonShape shape;
@@ -21,6 +25,11 @@ public class Cannon implements IEntity
     private float angle = (float)Math.PI;
 
     public Cannon(World world) {
+
+        texture = new Texture("square.png");
+        sprite = new Sprite(texture);
+        sprite.setSize(25,85);
+        sprite.setOrigin(sprite.getWidth()/2,sprite.getHeight());
 
         //setting up the definition fot the body.
         bodyDef = new BodyDef();
@@ -64,11 +73,15 @@ public class Cannon implements IEntity
     {
         if(angle < 1.5*Math.PI && angle > Math.PI/2)
         body.setTransform(body.getPosition(),angle);
+
+        sprite.setPosition((body.getPosition().x* BlizzardBlaster.GetPixelMeter())-sprite.getWidth()/2, (body.getPosition().y*BlizzardBlaster.GetPixelMeter())-sprite.getHeight()/2);
+        sprite.setRotation((float)Math.toDegrees(body.getAngle()));
     }
 
     @Override
-    public void Draw(Batch batch) {
-
+    public void Draw(Batch batch)
+    {
+        batch.draw(sprite, sprite.getX(), sprite.getY()-40,sprite.getOriginX(),sprite.getOriginY(), sprite.getWidth(),sprite.getHeight(),sprite.getScaleX(),sprite.getScaleY(),sprite.getRotation());
     }
 
     @Override
@@ -80,7 +93,7 @@ public class Cannon implements IEntity
     @Override
     public void SetMustDie(boolean mustDie)
     {
-        this.mustDie = mustDie;
+        //NEVER MUST DIE
     }
 
     @Override
